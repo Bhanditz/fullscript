@@ -5,7 +5,7 @@
 # Ex.: ./fullscript.sh
 #
 # Autor: Marcos da B. M. Oliveira <http://amigosdopinguim.blogspot.com.br/>
-# Versão: 1
+# Versão: 1 (algumas atualizações de correções, pesquise a palavra MODIFICADO e descubra)
 # Licença: GPL
 # ----------------------------------------------------------------------------
 
@@ -66,8 +66,8 @@ deb-src http://security.debian.org/ wheezy/updates main contrib non-free";
 		if [ "$versao" = "6" ]; then
 		
 			echo "$squeeze" > /etc/apt/sources.list
-			
-		elif [ "$distro" = "7" ]; then
+		# MODIFICADO deste item, tava como $distro, alterei pra $versao
+		elif [ "$versao" = "7" ]; then
 		
 			echo "$wheezy" > /etc/apt/sources.list
 			
@@ -122,46 +122,6 @@ padroes(){
 # função para instalar os aplicativos personalizados
 personalizados(){
 
-	# pegando a URL para instalar os INSTALADORES amigos do pinguim
-	instaladoresadp="http://aarnet.dl.sourceforge.net/project/instaladoresadp/instaladoresadp.tar.gz"
-	
-	# baixando os INSTALADORES
-	wget $instaladoresadp
-	
-	# descomprimindo
-	tar -zxf instaladoresadp.tar.gz
-	
-	# atribuino permissão de execução das mesmas
-	chmod +x -R instaladoresadp
-	
-	# removendo o Iceweasel e instalando o Firefox, se não houver Iceweasel, não acontecerá nada (caso do Ubuntu e Debians-Like), só instalará o Firefox
-	./rmiceinsfox.sh
-	
-	# dormindo por 2 segundos
-	sleep 2
-	
-	# instalando o PHP-GTK
-	./installPHPGTK.sh
-	
-	# dormindo por 2 segundos
-	sleep 2
-	
-	# instalando o OpenSSH
-	./installOpenSSH.sh
-	
-	# dormindo por 2 segundos
-	sleep 2
-	
-	# instalando o NFS
-	./installNFS.sh
-	
-	# dormindo por 2 segundos
-	sleep 2
-	./instfuncoesadp.sh
-	
-	# dormindo por 2 segundos
-	sleep 2
-	
 	# verificar se é 32 ou 64 bits,pra baixar o pacote adequado do Aptana Studio 3 e Google Chrome
 	if [ "$(getconf LONG_BIT)" = "64" ]; then
 
@@ -180,12 +140,32 @@ personalizados(){
 	
 	# instala o pacote do Aptana Studio 3
 	dpkg -i Aptana_Studio_3_Setup_Linux_x86_*.deb
-	
+			
 	# baixa o pacote adequado do Google Chrome
 	wget $chromeurl
 	
 	# instala o pacote adequado do Google Chrome
 	dpkg -i google-chrome-stable_current*.deb
+	
+	# dormindo
+	sleep 2
+	
+	# MODIFICADO nao criava icone automatico no menu , criado este item , com o tempo vou atualizar o .deb do 32 e do 64
+	# depois da alteração esse item rodando ou não, não fará diferença
+	# o icone criado servirá, lógico pro 32 e pro 64 bits
+	
+	echo "[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Terminal=false
+Name=Google Chrome
+Name[en_US]=Google Chrome
+Name[pt_BR]=Google Chrome
+Exec=google-chrome
+Icon=/opt/google/chrome/product_logo_48.png
+Categories=Network;WebBrowser;
+StartupNotify=true" > /usr/share/applications//usr/share/applications/google-chrome.desktop
 	
 	# baixa o Skype
 	if [ "$distro" = "Debian" ]; then
@@ -204,6 +184,49 @@ personalizados(){
 
 # função para instalar os aplicativos que dependerão de interação do usuário(para responder perguntas do Shell)
 interativos(){
+
+	# pegando a URL para instalar os INSTALADORES amigos do pinguim
+	# MODIFICADO , pois existe pergunta, logo movido para a função interativos
+	instaladoresadp="http://aarnet.dl.sourceforge.net/project/instaladoresadp/instaladoresadp.tar.gz"
+	
+	# baixando os INSTALADORES
+	wget $instaladoresadp
+	
+	# descomprimindo
+	tar -zxf instaladoresadp.tar.gz
+	
+	# atribuindo permissão de execução das mesmas MODIFICADO alterar o caminho de execução dos arquivos
+	chmod +x -R instaladoresadp/
+	
+	# removendo o Iceweasel e instalando o Firefox, se não houver Iceweasel, não acontecerá nada (caso do Ubuntu e Debians-Like), só instalará o Firefox
+	instaladoresadp/./rmiceinsfox.sh
+	
+	# dormindo por 2 segundos
+	sleep 2
+	
+	# instalando o PHP-GTK
+	instaladoresadp/./installPHPGTK.sh
+	
+	# dormindo por 2 segundos
+	sleep 2
+	
+	# instalando o OpenSSH
+	instaladoresadp/./installOpenSSH.sh
+	
+	# dormindo por 2 segundos
+	sleep 2
+	
+	# instalando o NFS
+	instaladoresadp/./installNFS.sh
+	
+	# MODIFICADO , pois o user é ROOT, não será mais instalada no fullscript.sh
+	# mas você pode instalá-la logando com seu usuário, depois entra na pasta instaladoresadp (no local onde está salva)
+	# e então executar somente esse instalador: ./instfuncoesadp.sh
+	
+	#instaladoresadp/f./instfuncoesadp.sh
+	
+	# dormindo por 2 segundos
+	sleep 2
 	
 	# instala o MySQL Cliente e Servidor e mais o php5-mysql
 	apt-get install mysql-client mysql-server php5-mysql -y
